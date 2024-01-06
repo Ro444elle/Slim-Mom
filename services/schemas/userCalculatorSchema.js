@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userCalculatorSchema = new Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   height: {
     type: Number,
     validate: {
@@ -53,12 +57,16 @@ const userCalculatorSchema = new Schema({
     enum: ["female", "male"],
     require: [true, "Gender is required, for a personalised recommendation"],
   },
+  dailyCaloriesToIntake: {
+    type: Number,
+    require: true,
+  },
 });
 
 userCalculatorSchema.methods.calculateDailyCalories = function () {
   const weightDifference = this.currentWeight - this.desiredWeight;
   const totalCalories = weightDifference * 7700;
-  const dailyCalories = totalCalories / 14;
+  const caloriesPerDay = totalCalories / 90;
 
   // Calculate basal metabolic rate (BMR) using the Mifflin-St Jeor Equation
   let bmr;
@@ -68,7 +76,14 @@ userCalculatorSchema.methods.calculateDailyCalories = function () {
     bmr = 10 * this.currentWeight + 6.25 * this.height - 5 * this.age + 5;
   }
 
-  return bmr + dailyCalories;
+  let dailyCalories = bmr - caloriesPerDay;
+  if (this.gender === "female" && dailyCalories < 1200) {
+    dailyCalories = 1200;
+  } else if (this.gender === "male" && dailyCalories < 1500) {
+    dailyCalories = 1500;
+  }
+
+  return dailyCalories;
 };
 
 const UserCalculator = mongoose.model("UserCalculator", userCalculatorSchema);

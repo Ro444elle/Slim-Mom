@@ -7,10 +7,10 @@ import("nanoid").then((module) => {
   nanoid = module.nanoid;
 });
 
-const createIntakeProfile = async (userData) => {
+const createIntakeProfile = async (userId, userData) => {
   try {
     const { height, age, currentWeight, desiredWeight, bloodType, gender } = userData;
-    const userCalculator = new UserCalculator({
+    const tempCalculator = new UserCalculator({
       height,
       age,
       currentWeight,
@@ -18,14 +18,26 @@ const createIntakeProfile = async (userData) => {
       bloodType,
       gender,
     });
-    const dailyIntake = userCalculator.calculateDailyCalories();
-    return dailyIntake;
+    const profileIntake = await tempCalculator.calculateDailyCalories();
+    if (userId) {
+      const userCalculator = new UserCalculator({
+        userId,
+        height,
+        age,
+        currentWeight,
+        desiredWeight,
+        bloodType,
+        gender,
+        dailyCaloriesToIntake: profileIntake,
+      });
+      await userCalculator.save();
+    }
+    return profileIntake;
   } catch (error) {
-    console.log(error);
+    console.error("Error in createIntakeProfile:", error);
     throw error;
   }
 };
-
 const createUser = async ({ name, email, password }) => {
   try {
     const userExisting = await User.findOne({ email });

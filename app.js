@@ -11,7 +11,7 @@ dotenv.config();
 require("./middleware/passportConfig.js");
 
 const usersRouter = require("./routes/usersRoute.js");
-const productsRouter = require("./routes/productsRoute");
+const productsRouter = require("./routes/productsRoute.js");
 const coreOptions = require("./cors.js");
 
 const app = express();
@@ -23,7 +23,7 @@ app.use(express.json());
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 app.use("/users", usersRouter);
-app.use("products", productsRouter);
+app.use("/products", productsRouter);
 
 app.use((_, res, __) => {
   res.status(404).json({

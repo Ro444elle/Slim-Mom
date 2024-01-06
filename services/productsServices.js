@@ -13,10 +13,17 @@ const getProducts = async () => {
 
 const addIntakeProduct = async (userId, productId, amountInGrams) => {
   const product = await Product.findById(productId);
-  const diaryEntry = await DiaryEntry.findOne({
+  if (!product) {
+    throw new Error("Product not found");
+  }
+  let diaryEntry = await DiaryEntry.findOne({
     user: userId,
     date: { $gte: new Date().setHours(0, 0, 0, 0), $lt: new Date().setHours(23, 59, 59, 999) },
   });
+
+  if (!diaryEntry) {
+    diaryEntry = new DiaryEntry({ user: userId, date: new Date(), consumedProducts: [] });
+  }
   diaryEntry.consumedProducts.push({
     productName: product._id,
     amountInGrams,

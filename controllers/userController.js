@@ -26,14 +26,11 @@ const createIntakeProfileController = async (req, res, next) => {
         data: "Bad Request",
       });
     }
-    const dataToCalculate = await createIntakeProfile({
-      height,
-      age,
-      currentWeight,
-      desiredWeight,
-      bloodType,
-      gender,
-    });
+
+    const userId = req.user ? req.user._id : null;
+    const userData = { height, age, currentWeight, desiredWeight, bloodType, gender };
+    const dataToCalculate = await createIntakeProfile(userId, userData);
+
     res.status(200).json({
       status: "success",
       code: 200,

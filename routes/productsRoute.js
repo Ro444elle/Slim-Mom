@@ -15,3 +15,5 @@ router.get("/diary/products-list", auth, getProductsController);
 router.post("/diary/add-intakeProduct", auth, addIntakeProductController);
 router.delete("/diary/delete-product/:productId", auth, deleteIntakeProductController);
 router.get("/diary/day-info/:selectedDay", auth, getInfoSelectedDayController);
+
+module.exports = router;
